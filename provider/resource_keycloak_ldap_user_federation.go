@@ -138,6 +138,12 @@ func resourceKeycloakLdapUserFederation() *schema.Resource {
 				Description:  "ONE_LEVEL: only search for users in the DN specified by user_dn. SUBTREE: search entire LDAP subtree.",
 			},
 
+			"enable_starttls": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "When true, Keycloak will encrypt the connect to LDAP with STARTTLS.",
+			},
 			"validate_password_policy": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -276,6 +282,7 @@ func getLdapUserFederationFromData(data *schema.ResourceData) *keycloak.LdapUser
 		CustomUserSearchFilter: data.Get("custom_user_search_filter").(string),
 		SearchScope:            data.Get("search_scope").(string),
 
+		EnableStartTLS:         data.Get("enable_starttls").(bool),
 		ValidatePasswordPolicy: data.Get("validate_password_policy").(bool),
 		UseTruststoreSpi:       data.Get("use_truststore_spi").(string),
 		ConnectionTimeout:      data.Get("connection_timeout").(string),
@@ -330,6 +337,7 @@ func setLdapUserFederationData(data *schema.ResourceData, ldap *keycloak.LdapUse
 	data.Set("custom_user_search_filter", ldap.CustomUserSearchFilter)
 	data.Set("search_scope", ldap.SearchScope)
 
+	data.Set("enable_starttls", ldap.EnableStartTLS)
 	data.Set("validate_password_policy", ldap.ValidatePasswordPolicy)
 	data.Set("use_truststore_spi", ldap.UseTruststoreSpi)
 	data.Set("connection_timeout", ldap.ConnectionTimeout)

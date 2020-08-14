@@ -139,6 +139,7 @@ func generateRandomLdapKerberos(enabled bool) *keycloak.LdapUserFederation {
 		BindDn:                               acctest.RandString(10),
 		BindCredential:                       acctest.RandString(10),
 		SearchScope:                          randomStringInSlice([]string{"ONE_LEVEL", "SUBTREE"}),
+		EnableStartTLS:                       true,
 		ValidatePasswordPolicy:               true,
 		UseTruststoreSpi:                     randomStringInSlice([]string{"ALWAYS", "ONLY_FOR_LDAPS", "NEVER"}),
 		ConnectionTimeout:                    connectionTimeout,
@@ -217,6 +218,7 @@ func TestAccKeycloakLdapUserFederation_basicUpdateKerberosSettings(t *testing.T)
 func TestAccKeycloakLdapUserFederation_basicUpdateAll(t *testing.T) {
 	realmName := "terraform-" + acctest.RandString(10)
 	firstEnabled := randomBool()
+	firstEnableStartTLS := randomBool()
 	firstValidatePasswordPolicy := randomBool()
 	firstPagination := randomBool()
 
@@ -237,6 +239,7 @@ func TestAccKeycloakLdapUserFederation_basicUpdateAll(t *testing.T) {
 		BindDn:                               acctest.RandString(10),
 		BindCredential:                       acctest.RandString(10),
 		SearchScope:                          randomStringInSlice([]string{"ONE_LEVEL", "SUBTREE"}),
+		EnableStartTLS:                       firstEnableStartTLS,
 		ValidatePasswordPolicy:               firstValidatePasswordPolicy,
 		UseTruststoreSpi:                     randomStringInSlice([]string{"ALWAYS", "ONLY_FOR_LDAPS", "NEVER"}),
 		ConnectionTimeout:                    firstConnectionTimeout,
@@ -265,6 +268,7 @@ func TestAccKeycloakLdapUserFederation_basicUpdateAll(t *testing.T) {
 		BindDn:                               acctest.RandString(10),
 		BindCredential:                       acctest.RandString(10),
 		SearchScope:                          randomStringInSlice([]string{"ONE_LEVEL", "SUBTREE"}),
+		EnableStartTLS:                       !firstEnableStartTLS,
 		ValidatePasswordPolicy:               !firstValidatePasswordPolicy,
 		UseTruststoreSpi:                     randomStringInSlice([]string{"ALWAYS", "ONLY_FOR_LDAPS", "NEVER"}),
 		ConnectionTimeout:                    secondConnectionTimeout,
@@ -642,6 +646,7 @@ resource "keycloak_ldap_user_federation" "openldap" {
 	bind_credential          = "%s"
 	search_scope             = "%s"
 
+	enable_starttls          = %t
 	validate_password_policy = %t
 	use_truststore_spi       = "%s"
 	connection_timeout       = "%s"
@@ -661,7 +666,7 @@ resource "keycloak_ldap_user_federation" "openldap" {
 
 	cache_policy             = "%s"
 }
-	`, ldap.RealmId, ldap.Name, ldap.Enabled, ldap.UsernameLDAPAttribute, ldap.RdnLDAPAttribute, ldap.UuidLDAPAttribute, arrayOfStringsForTerraformResource(ldap.UserObjectClasses), ldap.ConnectionUrl, ldap.UsersDn, ldap.BindDn, ldap.BindCredential, ldap.SearchScope, ldap.ValidatePasswordPolicy, ldap.UseTruststoreSpi, ldap.ConnectionTimeout, ldap.ReadTimeout, ldap.Pagination, ldap.BatchSizeForSync, ldap.FullSyncPeriod, ldap.ChangedSyncPeriod, ldap.ServerPrincipal, ldap.UseKerberosForPasswordAuthentication, ldap.KeyTab, ldap.KerberosRealm, ldap.CachePolicy)
+	`, ldap.RealmId, ldap.Name, ldap.Enabled, ldap.UsernameLDAPAttribute, ldap.RdnLDAPAttribute, ldap.UuidLDAPAttribute, arrayOfStringsForTerraformResource(ldap.UserObjectClasses), ldap.ConnectionUrl, ldap.UsersDn, ldap.BindDn, ldap.BindCredential, ldap.SearchScope, ldap.EnableStartTLS, ldap.ValidatePasswordPolicy, ldap.UseTruststoreSpi, ldap.ConnectionTimeout, ldap.ReadTimeout, ldap.Pagination, ldap.BatchSizeForSync, ldap.FullSyncPeriod, ldap.ChangedSyncPeriod, ldap.ServerPrincipal, ldap.UseKerberosForPasswordAuthentication, ldap.KeyTab, ldap.KerberosRealm, ldap.CachePolicy)
 }
 
 func testKeycloakLdapUserFederation_basicWithAttrValidation(attr, realm, ldap, val string) string {

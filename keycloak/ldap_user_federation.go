@@ -30,6 +30,7 @@ type LdapUserFederation struct {
 	CustomUserSearchFilter string // must start with '(' and end with ')'
 	SearchScope            string // api expects "1" or "2", but that means "One Level" or "Subtree"
 
+	EnableStartTLS         bool
 	ValidatePasswordPolicy bool
 	UseTruststoreSpi       string // can be "ldapsOnly", "always", or "never"
 	ConnectionTimeout      string // duration string (ex: 1h30m)
@@ -92,6 +93,9 @@ func convertFromLdapUserFederationToComponent(ldap *LdapUserFederation) (*compon
 		},
 		"searchScope": {
 			ldap.SearchScope,
+		},
+		"startTls": {
+			strconv.FormatBool(ldap.EnableStartTLS),
 		},
 		"validatePasswordPolicy": {
 			strconv.FormatBool(ldap.ValidatePasswordPolicy),
@@ -206,6 +210,11 @@ func convertFromComponentToLdapUserFederation(component *component) (*LdapUserFe
 
 	userObjectClasses := strings.Split(component.getConfig("userObjectClasses"), ", ")
 
+	enableStartTLS, err := parseBoolAndTreatEmptyStringAsFalse(component.getConfig("startTls"))
+	if err != nil {
+		return nil, err
+	}
+
 	validatePasswordPolicy, err := parseBoolAndTreatEmptyStringAsFalse(component.getConfig("validatePasswordPolicy"))
 	if err != nil {
 		return nil, err
@@ -265,6 +274,7 @@ func convertFromComponentToLdapUserFederation(component *component) (*LdapUserFe
 		CustomUserSearchFilter: component.getConfig("customUserSearchFilter"),
 		SearchScope:            component.getConfig("searchScope"),
 
+		EnableStartTLS:         enableStartTLS,
 		ValidatePasswordPolicy: validatePasswordPolicy,
 		UseTruststoreSpi:       component.getConfig("useTruststoreSpi"),
 		Pagination:             pagination,
